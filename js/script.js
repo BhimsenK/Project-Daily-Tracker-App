@@ -34,61 +34,69 @@ function generateCalendar() {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const startingDay = firstDay.getDay();
+    const daysInMonth = lastDay.getDate();
 
     // Add days from previous month
     const prevMonth = new Date(year, month, 0);
+    const prevMonthDays = prevMonth.getDate();
     for (let i = startingDay - 1; i >= 0; i--) {
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day other-month';
-        dayElement.textContent = prevMonth.getDate() - i;
+        dayElement.textContent = prevMonthDays - i;
         calendar.appendChild(dayElement);
     }
 
     // Add days of current month
-    for (let day = 1; day <= lastDay.getDate(); day++) {
+    for (let day = 1; day <= 31; day++) {
         const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
+        
+        // Check if this is a valid date for the current month
+        const isValidDate = day <= daysInMonth;
+        dayElement.className = `calendar-day${isValidDate ? '' : ' invalid-date'}`;
         dayElement.textContent = day;
 
-        const currentDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        
-        // Check if this day has any activities
-        const activities = JSON.parse(localStorage.getItem(currentDate) || '[]');
-        if (activities.length > 0) {
-            dayElement.classList.add('has-activities');
-        }
-
-        // Check if this is today
-        const today = new Date();
-        if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
-            dayElement.classList.add('today');
-        }
-
-        // Check if this is the selected date
-        if (currentDate === selectedDate) {
-            dayElement.classList.add('selected');
-        }
-
-        dayElement.addEventListener('click', () => {
-            selectedDate = currentDate;
-            updateSelectedDate();
-            loadActivities();
+        if (isValidDate) {
+            const currentDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             
-            // Remove selected class from all days
-            document.querySelectorAll('.calendar-day').forEach(day => {
-                day.classList.remove('selected');
+            // Check if this day has any activities
+            const activities = JSON.parse(localStorage.getItem(currentDate) || '[]');
+            if (activities.length > 0) {
+                dayElement.classList.add('has-activities');
+            }
+
+            // Check if this is today
+            const today = new Date();
+            if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                dayElement.classList.add('today');
+            }
+
+            // Check if this is the selected date
+            if (currentDate === selectedDate) {
+                dayElement.classList.add('selected');
+            }
+
+            dayElement.addEventListener('click', () => {
+                selectedDate = currentDate;
+                updateSelectedDate();
+                loadActivities();
+                
+                // Remove selected class from all days
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    day.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked day
+                dayElement.classList.add('selected');
             });
-            
-            // Add selected class to clicked day
-            dayElement.classList.add('selected');
-        });
+        }
 
         calendar.appendChild(dayElement);
     }
 
-    // Add days from next month
-    const remainingDays = 42 - (startingDay + lastDay.getDate()); // 42 = 6 rows × 7 days
-    for (let i = 1; i <= remainingDays; i++) {
+    // Fill remaining grid cells if needed (to maintain 6 rows)
+    const totalCells = 42; // 6 rows × 7 days
+    const remainingCells = totalCells - (startingDay + 31);
+    for (let i = 1; i <= remainingCells; i++) {
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day other-month';
         dayElement.textContent = i;

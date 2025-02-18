@@ -14,13 +14,16 @@ body {
 
 /* Container */
 .container {
-    max-width: 400px;
-    width: 100%;
-    padding: 20px;
-    border-radius: 15px;
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0px 0px 20px rgba(0, 162, 255, 0.5);
-    backdrop-filter: blur(10px);
+    max-width: 100%;
+    padding: 15px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 768px;
+    }
 }
 
 /* Title */
@@ -29,36 +32,54 @@ h1 {
     color: cyan;
     text-shadow: 0 0 10px cyan;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 /* Month & Year Selection */
-select {
+.selector-container {
+    display: flex;
+    gap: 10px;
     margin-bottom: 15px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid cyan;
-    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+}
+
+select {
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 6px;
     color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 0.9em;
 }
 
-select:hover {
-    border-color: lime;
-    box-shadow: 0 0 10px lime;
+select:focus {
+    outline: none;
+    border-color: cyan;
 }
 
-/* Calendar */
+/* Calendar Container */
+.calendar-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Calendar Grid */
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    margin: 20px 0;
+    gap: 4px;
+    width: 100%;
+    aspect-ratio: 7/6;
+    margin: 0 auto;
     padding: 10px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+    box-sizing: border-box;
 }
 
 .weekday-header {
@@ -66,12 +87,13 @@ select:hover {
     text-align: center;
     padding: 5px;
     font-weight: bold;
-    font-size: 0.9em;
+    font-size: 0.8em;
     text-transform: uppercase;
 }
 
+/* Calendar Days */
 .calendar-day {
-    aspect-ratio: 1;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,30 +101,38 @@ select:hover {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
-    position: relative;
-    padding: 5px;
-    min-height: 40px;
+    font-size: 0.9em;
+    padding: 0;
+    aspect-ratio: 1;
 }
 
-.calendar-day:hover {
+.calendar-day.other-month {
+    opacity: 0.3;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.calendar-day.invalid-date {
+    opacity: 0.3;
+    pointer-events: none;
+    background: rgba(255, 0, 0, 0.05);
+}
+
+.calendar-day:hover:not(.other-month):not(.invalid-date) {
     background: rgba(0, 255, 255, 0.2);
     transform: scale(1.05);
 }
 
-.calendar-day.selected {
+.calendar-day.selected:not(.other-month):not(.invalid-date) {
     background: rgba(0, 255, 255, 0.3);
     border: 2px solid #00ffff;
 }
 
-.calendar-day.today {
+.calendar-day.today:not(.other-month):not(.invalid-date) {
     border: 2px solid #32cd32;
 }
 
-.calendar-day.other-month {
-    opacity: 0.5;
-}
-
-.calendar-day.has-activities::after {
+.calendar-day.has-activities:not(.other-month):not(.invalid-date)::after {
     content: '';
     position: absolute;
     bottom: 5px;
@@ -112,6 +142,33 @@ select:hover {
     height: 5px;
     background: #32cd32;
     border-radius: 50%;
+}
+
+/* Responsive Calendar Adjustments */
+@media (max-width: 480px) {
+    .calendar-container {
+        padding: 5px;
+    }
+
+    .calendar {
+        gap: 2px;
+        padding: 5px;
+    }
+
+    .calendar-day {
+        font-size: 0.8em;
+    }
+
+    .weekday-header {
+        font-size: 0.7em;
+        padding: 3px;
+    }
+}
+
+@media (max-width: 360px) {
+    .calendar-day {
+        font-size: 0.7em;
+    }
 }
 
 /* Editable Title */
@@ -144,14 +201,13 @@ select:hover {
 #activity-list {
     max-height: 400px;
     overflow-y: auto;
-    margin: 20px 0;
+    margin: 20px auto;
     padding: 15px;
     background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
     border-radius: 12px;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 0 2px rgba(0, 255, 255, 0.1) inset;
-    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Activity Item */
@@ -183,9 +239,7 @@ select:hover {
 
 .activity-item:hover {
     transform: translateY(-2px);
-    box-shadow: 
-        0 4px 15px rgba(0, 0, 0, 0.2),
-        0 0 0 1px rgba(0, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .activity-item:hover::before {
@@ -220,10 +274,7 @@ select:hover {
     top: 50%;
     width: 100%;
     height: 1px;
-    background: linear-gradient(90deg, 
-        rgba(50, 205, 50, 0.5),
-        rgba(50, 205, 50, 0.2)
-    );
+    background: linear-gradient(90deg, rgba(50, 205, 50, 0.5), rgba(50, 205, 50, 0.2));
     transform: scaleX(1);
     transform-origin: left;
     transition: transform 0.3s ease;
@@ -325,19 +376,13 @@ select:hover {
 }
 
 #activity-list::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-        rgba(0, 255, 255, 0.2),
-        rgba(0, 255, 255, 0.3)
-    );
+    background: linear-gradient(rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.3));
     border-radius: 3px;
     border: 1px solid rgba(0, 255, 255, 0.1);
 }
 
 #activity-list::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(
-        rgba(0, 255, 255, 0.3),
-        rgba(0, 255, 255, 0.4)
-    );
+    background: linear-gradient(rgba(0, 255, 255, 0.3), rgba(0, 255, 255, 0.4));
 }
 
 /* Buttons */
